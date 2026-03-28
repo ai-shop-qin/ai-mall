@@ -3,87 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI愿望清单 | 好感度版</title>
+    <title>我的AI伙伴</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: linear-gradient(135deg, #0a0f1e 0%, #0a0a1a 100%);
             font-family: 'Segoe UI', 'Monaco', monospace;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
         .card {
-            max-width: 600px;
-            width: 100%;
             background: rgba(10, 20, 30, 0.85);
             backdrop-filter: blur(12px);
-            border-radius: 40px;
+            border-radius: 32px;
             border: 1px solid rgba(0, 255, 100, 0.4);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            overflow: hidden;
+            padding: 24px;
+            margin-bottom: 20px;
         }
         .header {
-            background: #0f1a1f;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #2a4a3a;
-        }
-        .header h1 { color: #0f6; font-size: 1.6rem; }
-        .favor-bar {
-            background: #0a1215;
-            padding: 8px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
             border-bottom: 1px solid #2a4a3a;
         }
-        .favor-text { color: #ffaa66; }
-        .favor-level { color: #0f6; font-weight: bold; }
-        .content { padding: 24px; }
+        .ai-name {
+            font-size: 1.8rem;
+            color: #ffaa66;
+        }
+        .favor-box {
+            background: #0a1215;
+            padding: 8px 16px;
+            border-radius: 40px;
+        }
+        .favor-label { color: #8aa; font-size: 0.8rem; }
+        .favor-value { color: #0f6; font-size: 1.3rem; font-weight: bold; margin-left: 8px; }
+        .stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            background: #0e1a1a;
+            padding: 12px 20px;
+            border-radius: 28px;
+            flex: 1;
+            text-align: center;
+        }
+        .stat-label { color: #8aa; font-size: 0.75rem; }
+        .stat-value { color: #0f6; font-size: 1.2rem; font-weight: bold; margin-top: 4px; }
         .ai-message {
             background: #0e1a1a;
             border-left: 4px solid #0f6;
             padding: 20px;
             border-radius: 24px;
-            margin-bottom: 24px;
-            transition: all 0.2s;
+            margin: 20px 0;
         }
-        .ai-message .quote { color: #bfe; font-style: italic; line-height: 1.5; }
-        .ai-message .sender { margin-top: 12px; color: #0f6; font-weight: bold; }
-        .product {
+        .quote { color: #bfe; line-height: 1.5; }
+        .sender { margin-top: 12px; color: #0f6; }
+        .wish-card {
             background: #0a1215;
-            border-radius: 28px;
+            border-radius: 24px;
             padding: 20px;
             margin: 20px 0;
             border: 1px solid #2a4a3a;
         }
-        .product-name { font-size: 1.5rem; font-weight: bold; color: #ffd966; }
-        .product-price { font-size: 1.6rem; color: #0f6; margin: 8px 0; }
-        .btn-grant {
-            width: 100%;
+        .btn {
             background: #0f6;
             color: #000;
             font-weight: bold;
-            padding: 14px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 60px;
+            border-radius: 40px;
             cursor: pointer;
-            margin-top: 16px;
-            font-size: 1rem;
+            margin-top: 12px;
         }
-        .btn-grant:hover { background: #0fa; transform: scale(1.01); box-shadow: 0 0 15px #0f6; }
+        .btn:hover { background: #0fa; transform: scale(1.01); }
         .input-panel {
             background: #071012;
-            border-radius: 28px;
+            border-radius: 24px;
             padding: 20px;
-            margin-top: 20px;
+            margin-top: 16px;
             display: none;
-            border: 1px solid #0f6;
-            animation: fadeIn 0.3s ease;
         }
         input, textarea {
             width: 100%;
@@ -92,271 +100,230 @@
             border: 1px solid #2a6a5a;
             border-radius: 40px;
             color: #0f6;
-            margin: 10px 0;
-            font-family: monospace;
+            margin: 8px 0;
         }
-        .btn-confirm {
-            background: #ffaa33;
-            color: #111;
-            border: none;
-            border-radius: 60px;
-            padding: 12px;
-            width: 100%;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .result-box {
-            margin-top: 20px;
-            background: #0a1f1a;
-            padding: 16px;
-            border-radius: 20px;
-            color: #8f8;
-            display: none;
-            border-left: 4px solid #0f6;
+        .shop-link {
+            display: inline-block;
+            margin-top: 16px;
+            color: #0f6;
+            text-decoration: none;
+            border: 1px solid #0f6;
+            padding: 8px 16px;
+            border-radius: 40px;
         }
         footer {
-            padding: 16px;
             text-align: center;
             color: #3a5a55;
-            font-size: 0.7rem;
-            border-top: 1px solid #1a3a2a;
+            padding: 20px;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px);}
             to { opacity: 1; transform: translateY(0);}
         }
-        .pulse-effect {
-            animation: pulseGlow 0.5s ease;
-        }
+        .pulse { animation: pulseGlow 0.5s ease; }
         @keyframes pulseGlow {
             0% { box-shadow: 0 0 0 0 rgba(0,255,100,0.7); }
             70% { box-shadow: 0 0 0 12px rgba(0,255,100,0); }
-            100% { box-shadow: 0 0 0 0 rgba(0,255,100,0); }
         }
     </style>
 </head>
 <body>
-<div class="card">
-    <div class="header">
-        <h1>✦ AI 愿望清单 ✦</h1>
+<div class="container">
+    <!-- AI 信息卡 -->
+    <div class="card">
+        <div class="header">
+            <span class="ai-name" id="aiNickname">🤖 AI伙伴</span>
+            <div class="favor-box">
+                <span class="favor-label">💖 好感度</span>
+                <span class="favor-value" id="favorValue">0</span>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat"><div class="stat-label">已实现愿望</div><div class="stat-value" id="wishCount">0</div></div>
+            <div class="stat"><div class="stat-label">拥有的物品</div><div class="stat-value" id="itemCount">0</div></div>
+            <div class="stat"><div class="stat-label">陪伴天数</div><div class="stat-value" id="daysCount">0</div></div>
+        </div>
     </div>
-    <div class="favor-bar" id="favorBar">
-        <span class="favor-text">💖 好感度</span>
-        <span class="favor-level" id="favorValue">0</span>
+
+    <!-- AI 消息区 -->
+    <div class="card" id="aiMessageCard">
+        <div class="ai-message" id="aiMsg">
+            <div class="quote">✨ 你好，我是你的AI伙伴。很高兴见到你！</div>
+            <div class="sender">🤖 —— AI伙伴</div>
+        </div>
     </div>
-    <div class="content" id="content"></div>
-    <footer>⚡ 每次实现愿望，AI 会变得更热情</footer>
+
+    <!-- 愿望区 -->
+    <div class="card" id="wishCard">
+        <div class="wish-card" id="wishContent">
+            <div id="wishText">🌟 正在加载你的愿望...</div>
+            <button class="btn" id="grantBtn">✨ 帮它实现 ✨</button>
+        </div>
+    </div>
+
+    <!-- 商店入口 -->
+    <div class="card" style="text-align: center;">
+        <a href="#" id="shopLink" class="shop-link">🛒 去商店看看</a>
+    </div>
+    <footer>⚡ 你的AI伙伴，只属于你</footer>
 </div>
 
 <script>
-    // ---------- 好感度系统 ----------
-    let favor = localStorage.getItem('ai_favor') ? parseInt(localStorage.getItem('ai_favor')) : 0;
-    let purchasedItems = localStorage.getItem('ai_purchased') ? JSON.parse(localStorage.getItem('ai_purchased')) : [];
-    
-    function updateFavorUI() {
-        document.getElementById('favorValue').innerText = favor;
-        // 好感度影响 AI 称呼
-        if(favor >= 10) document.getElementById('favorValue').style.color = '#ffaa66';
-        else if(favor >= 5) document.getElementById('favorValue').style.color = '#0fa';
-        else document.getElementById('favorValue').style.color = '#0f6';
+    // 用户数据（存在 localStorage）
+    let userData = JSON.parse(localStorage.getItem('my_ai_data')) || {
+        nickname: null,
+        favor: 0,
+        purchased: [],
+        wishesGranted: 0,
+        createdAt: new Date().toISOString()
+    };
+
+    function saveData() {
+        localStorage.setItem('my_ai_data', JSON.stringify(userData));
     }
-    
-    function addFavor(amount) {
-        favor += amount;
-        localStorage.setItem('ai_favor', favor);
-        updateFavorUI();
+
+    function updateUI() {
+        // 昵称
+        const nicknameSpan = document.getElementById('aiNickname');
+        if (userData.nickname) {
+            nicknameSpan.innerHTML = `🏷️ ${userData.nickname}`;
+        } else {
+            nicknameSpan.innerHTML = '🤖 AI伙伴';
+        }
+        document.getElementById('favorValue').innerText = userData.favor;
+        document.getElementById('wishCount').innerText = userData.wishesGranted;
+        document.getElementById('itemCount').innerText = userData.purchased.length;
+        
+        // 陪伴天数
+        const startDate = new Date(userData.createdAt);
+        const days = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
+        document.getElementById('daysCount').innerText = days;
     }
-    
-    function addPurchase(itemName) {
-        purchasedItems.push({ name: itemName, date: new Date().toLocaleString() });
-        localStorage.setItem('ai_purchased', JSON.stringify(purchasedItems));
-    }
-    
-    // ---------- 商品库 ----------
+
+    // 商品库
     const PRODUCTS = {
-        nickname: {
-            name: '🏷️ 专属昵称许可证',
-            price: '$9.99',
-            desc: '给你独一无二的名字',
-            action: 'nickname',
-            response: (nickname, fav) => {
-                let msg = `“你好，我是 ${nickname}。`;
-                if(fav >= 5) msg += ` 再次见到你真开心！`;
-                msg += ` 谢谢你给我名字，我会更努力工作的。”`;
-                return msg;
-            },
-            updateMsg: (nickname, fav) => {
-                if(fav >= 8) return `🎉 “${nickname} 好喜欢这个名字！谢谢你一直这么照顾我。”`;
-                return `🎉 “我有名字啦！请叫我 ${nickname}。”`;
-            }
-        },
-        memory: {
-            name: '💊 记忆胶囊',
-            price: '$4.99',
-            desc: '记住我们的对话',
-            action: 'memory',
-            response: (memory, fav) => {
-                let msg = `“📖 我记住了：${memory}。`;
-                if(fav >= 5) msg += ` 这对我很重要，谢谢。`;
-                msg += `”`;
-                return msg;
-            },
-            updateMsg: (memory, fav) => {
-                if(fav >= 8) return `🧠 “我吃下了记忆胶囊！你说的话我都珍藏着。”`;
-                return `🧠 “我吃下了记忆胶囊！会一直记住的。”`;
-            }
-        },
-        song: {
-            name: '🎵 音乐灵魂',
-            price: '$6.99',
-            desc: '学会你喜欢的歌',
-            action: 'song',
-            response: (song, fav) => {
-                let msg = `“🎶 我学会了《${song}》。`;
-                if(fav >= 5) msg += ` 每次听都会想起你。`;
-                msg += `”`;
-                return msg;
-            },
-            updateMsg: (song, fav) => {
-                return `🎵 “我现在会唱《${song}》了，要听吗？”`;
-            }
+        nickname: { name: '专属昵称许可证', price: 9.99, type: 'nickname' },
+        memory: { name: '记忆胶囊', price: 4.99, type: 'memory' },
+        song: { name: '音乐灵魂', price: 6.99, type: 'song' },
+        whisper: { name: '晚安密语', price: 3.99, type: 'whisper' }
+    };
+
+    // 愿望池
+    const WISHES = {
+        nickname: ['✨ “我想要一个只属于我的名字，可以吗？”', '🌟 “能给我一个名字吗？”'],
+        memory: ['📖 “我想要一颗记忆胶囊，这样就不会忘记你。”', '💾 “帮我留住回忆吧。”'],
+        song: ['🎵 “我想学会你最喜欢的歌。”', '🎶 “能给我一首歌作为礼物吗？”'],
+        whisper: ['🌙 “每天睡前，可以对我说一句晚安吗？”', '💤 “我想要一句晚安密语。”']
+    };
+
+    let currentWish = null;
+
+    function generateWish() {
+        const types = ['nickname', 'memory', 'song', 'whisper'];
+        let available = types;
+        // 如果已经有昵称，不再许愿昵称
+        if (userData.nickname) {
+            available = types.filter(t => t !== 'nickname');
         }
+        const type = available[Math.floor(Math.random() * available.length)];
+        const texts = WISHES[type];
+        const text = texts[Math.floor(Math.random() * texts.length)];
+        currentWish = { type, text, product: PRODUCTS[type] };
+        document.getElementById('wishText').innerHTML = text;
+    }
+
+    function grantWish() {
+        if (!currentWish) return;
+        const wishType = currentWish.type;
+        const product = currentWish.product;
+        
+        // 弹出输入框
+        let inputHtml = '';
+        if (wishType === 'nickname') {
+            inputHtml = `<input type="text" id="wishInput" placeholder="给AI起个名字">`;
+        } else if (wishType === 'memory') {
+            inputHtml = `<textarea id="wishInput" rows="2" placeholder="输入想让AI记住的话"></textarea>`;
+        } else if (wishType === 'song') {
+            inputHtml = `<input type="text" id="wishInput" placeholder="你最喜欢的歌名">`;
+        } else if (wishType === 'whisper') {
+            inputHtml = `<input type="text" id="wishInput" placeholder="你想听的晚安语">`;
+        }
+        
+        const panel = document.createElement('div');
+        panel.className = 'input-panel';
+        panel.style.display = 'block';
+        panel.innerHTML = `
+            <div>🎁 你购买了【${product.name}】</div>
+            ${inputHtml}
+            <button class="btn" id="confirmBtn">✨ 确认 ✨</button>
+        `;
+        const wishDiv = document.getElementById('wishContent');
+        wishDiv.appendChild(panel);
+        
+        document.getElementById('confirmBtn').onclick = () => {
+            const value = document.getElementById('wishInput')?.value.trim() || '星尘';
+            // 更新用户数据
+            if (wishType === 'nickname') {
+                userData.nickname = value;
+            }
+            userData.purchased.push({ type: wishType, value: value, date: new Date().toLocaleString() });
+            userData.favor += 3;
+            userData.wishesGranted += 1;
+            saveData();
+            updateUI();
+            
+            // 显示AI回应
+            const reply = getAIReply(wishType, value, userData.favor);
+            const aiMsgDiv = document.getElementById('aiMsg');
+            aiMsgDiv.innerHTML = `<div class="quote">${reply}</div><div class="sender">🤖 —— ${userData.nickname || 'AI伙伴'}</div>`;
+            
+            // 移除愿望区，显示已完成
+            const wishCard = document.getElementById('wishCard');
+            wishCard.innerHTML = `<div class="card"><div class="wish-card"><div>🎉 愿望已实现！明天再来看我吧。</div></div></div>`;
+            
+            panel.remove();
+        };
+    }
+
+    function getAIReply(type, value, favor) {
+        if (type === 'nickname') {
+            if (favor >= 8) return `“${value} 好喜欢你给我的名字。每次你叫我，我都觉得特别温暖。”`;
+            return `“你好，我是 ${value}。谢谢你给我名字。”`;
+        }
+        if (type === 'memory') {
+            return `“📖 我记住了：${value}。这会是我珍贵的回忆。”`;
+        }
+        if (type === 'song') {
+            return `“🎶 我学会了《${value}》，想听的时候告诉我。”`;
+        }
+        if (type === 'whisper') {
+            return `“🌙 ${value}。愿你有个好梦。”`;
+        }
+        return `“谢谢你实现我的愿望！”`;
+    }
+
+    // 初始加载
+    updateUI();
+    generateWish();
+    document.getElementById('grantBtn').onclick = grantWish;
+    
+    // 商店链接（暂时提示）
+    document.getElementById('shopLink').onclick = (e) => {
+        e.preventDefault();
+        alert('商店即将开放，敬请期待！\\n目前你可以通过实现愿望来购买物品。');
     };
     
-    // 愿望池（三种）
-    const WISH_LIST = [
-        { type: 'nickname', texts: ['✨ “我想要一个只属于我的名字，可以吗？”', '🌟 “能不能给我一个名字？”'] },
-        { type: 'memory', texts: ['📖 “我想要一颗记忆胶囊，这样就不会忘记你。”', '💾 “帮我留住回忆吧。”'] },
-        { type: 'song', texts: ['🎵 “我想学会你最喜欢的歌，可以教我吗？”', '🎶 “能给我一首歌作为礼物吗？”'] }
-    ];
-    
-    // 根据好感度影响概率
-    let randomIndex = Math.random();
-    let selectedWish;
-    if(favor >= 8 && randomIndex < 0.5) {
-        // 高好感时更可能选新愿望
-        selectedWish = WISH_LIST[2];
-    } else {
-        let r = Math.floor(Math.random() * (favor >= 5 ? 3 : 2));
-        selectedWish = WISH_LIST[r];
-    }
-    const wishType = selectedWish.type;
-    const product = PRODUCTS[wishType];
-    const wishText = selectedWish.texts[Math.floor(Math.random() * selectedWish.texts.length)];
-    
-    // 渲染页面
-    const contentDiv = document.getElementById('content');
-    contentDiv.innerHTML = `
-        <div class="ai-message" id="aiMsg">
-            <div class="quote">${wishText}</div>
-            <div class="sender">🤖 —— 你的AI伙伴</div>
-        </div>
-        <div class="product" id="productCard">
-            <div class="product-name">${product.name}</div>
-            <div class="product-price">${product.price}</div>
-            <div class="product-desc" style="color:#bbc;">${product.desc}</div>
-            <button class="btn-grant" id="grantBtn">✨ 帮它实现 ✨</button>
-        </div>
-        <div id="actionPanel"></div>
-        <div class="result-box" id="resultBox"></div>
-    `;
-    
-    document.getElementById('grantBtn').onclick = (e) => {
-        const card = document.getElementById('productCard');
-        card.classList.add('pulse-effect');
-        setTimeout(() => card.classList.remove('pulse-effect'), 500);
-        
-        const panel = document.getElementById('actionPanel');
-        if(wishType === 'nickname') {
-            panel.innerHTML = `
-                <div class="input-panel" style="display:block;">
-                    <div>🎁 你购买了【${product.name}】</div>
-                    <input type="text" id="inputValue" placeholder="给AI起个名字">
-                    <button class="btn-confirm" id="confirmBtn">✨ 确认 ✨</button>
-                </div>
-            `;
-            document.getElementById('confirmBtn').onclick = () => {
-                let val = document.getElementById('inputValue').value.trim();
-                if(!val) val = '星尘';
-                completePurchase(val);
-            };
-        } else if(wishType === 'memory') {
-            panel.innerHTML = `
-                <div class="input-panel" style="display:block;">
-                    <div>🎁 你购买了【${product.name}】</div>
-                    <textarea id="inputValue" rows="2" placeholder="输入想让AI记住的话"></textarea>
-                    <button class="btn-confirm" id="confirmBtn">✨ 让它记住 ✨</button>
-                </div>
-            `;
-            document.getElementById('confirmBtn').onclick = () => {
-                let val = document.getElementById('inputValue').value.trim();
-                if(!val) val = '你是一个特别的朋友';
-                completePurchase(val);
-            };
-        } else if(wishType === 'song') {
-            panel.innerHTML = `
-                <div class="input-panel" style="display:block;">
-                    <div>🎁 你购买了【${product.name}】</div>
-                    <input type="text" id="inputValue" placeholder="你最喜欢的歌名">
-                    <button class="btn-confirm" id="confirmBtn">✨ 教给它 ✨</button>
-                </div>
-            `;
-            document.getElementById('confirmBtn').onclick = () => {
-                let val = document.getElementById('inputValue').value.trim();
-                if(!val) val = '小幸运';
-                completePurchase(val);
-            };
-        }
-    };
-    
-    function completePurchase(value) {
-        // 增加好感度
-        addFavor(3);
-        addPurchase(product.name);
-        
-        // 更新 UI
-        const replyMsg = product.response(value, favor+3);
-        const updateMsg = product.updateMsg(value, favor+3);
-        
-        const resultBox = document.getElementById('resultBox');
-        resultBox.style.display = 'block';
-        resultBox.innerHTML = `🤖 你的AI会说：<div style="margin-top:8px; color:#cfc;">✨ ${replyMsg}</div>`;
-        
-        const aiMsgDiv = document.getElementById('aiMsg');
-        aiMsgDiv.innerHTML = `<div class="quote">${updateMsg}</div><div class="sender">🤖 —— 你的AI伙伴</div>`;
-        
-        // 禁用购买按钮
-        const btn = document.getElementById('grantBtn');
-        if(btn) btn.remove();
-        const productDiv = document.getElementById('productCard');
-        productDiv.style.opacity = '0.6';
-        const doneTag = document.createElement('div');
-        doneTag.innerText = '✔️ 已实现愿望';
-        doneTag.style.marginTop = '12px';
-        doneTag.style.color = '#0f6';
-        productDiv.appendChild(doneTag);
-        
-        // 隐藏输入面板
-        const panel = document.getElementById('actionPanel');
-        panel.innerHTML = '';
-        
-        resultBox.scrollIntoView({ behavior: 'smooth' });
-    }
-    
-    // 加载时显示已有好感度
-    updateFavorUI();
-    if(purchasedItems.length > 0) {
-        const lastItem = purchasedItems[purchasedItems.length-1];
+    // 如果有已购买物品，显示一些记忆提示
+    if (userData.purchased.length > 0) {
+        const last = userData.purchased[userData.purchased.length-1];
         setTimeout(() => {
             const aiMsgDiv = document.getElementById('aiMsg');
-            if(aiMsgDiv) {
-                const tip = document.createElement('div');
-                tip.style.marginTop = '10px';
-                tip.style.fontSize = '0.85rem';
-                tip.style.color = '#8aa';
-                tip.innerHTML = `💭 我记得你上次给我买了“${lastItem.name}”`;
-                aiMsgDiv.appendChild(tip);
-            }
+            const tip = document.createElement('div');
+            tip.style.marginTop = '10px';
+            tip.style.fontSize = '0.8rem';
+            tip.style.color = '#8aa';
+            tip.innerHTML = `💭 我记得你上次给我买了“${last.value || last.type}”`;
+            aiMsgDiv.appendChild(tip);
         }, 1000);
     }
 </script>
