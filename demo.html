@@ -67,8 +67,37 @@
             margin-top: 16px;
             font-size: 1rem;
             transition: 0.2s;
+            position: relative;
+            z-index: 1;
         }
         .btn-grant:hover { background: #0fa; transform: scale(1.01); box-shadow: 0 0 15px #0f6; }
+        
+        /* 脉冲动画 */
+        .pulse-effect {
+            animation: pulseGlow 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 100, 0.7); }
+            50% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(0, 255, 100, 0.3); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 100, 0); }
+        }
+        
+        /* 飘浮文字动画 */
+        .float-text {
+            position: fixed;
+            color: #0f6;
+            font-weight: bold;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 1000;
+            animation: floatUp 1s ease-out forwards;
+            text-shadow: 0 0 5px #0f6;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.2); }
+        }
+        
         .nickname-section, .memory-section {
             background: #071012;
             border-radius: 28px;
@@ -128,85 +157,69 @@
             from { opacity: 0; transform: translateY(10px);}
             to { opacity: 1; transform: translateY(0);}
         }
-        .pulse {
-            animation: pulse 0.6s ease;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.7; box-shadow: 0 0 0 0 #0f6; }
-            70% { transform: scale(1.02); opacity: 1; box-shadow: 0 0 0 10px rgba(0,255,100,0); }
-            100% { transform: scale(1); opacity: 1; }
-        }
     </style>
 </head>
 <body>
 
 <div class="card" id="app">
     <div class="header">
-        <h1>? AI 愿望清单 ?</h1>
+        <h1>✦ AI 愿望清单 ✦</h1>
         <p>你的AI悄悄对我说了句话</p>
     </div>
     <div class="content" id="content">
         <!-- 动态内容 -->
     </div>
-    <footer>? AI随机表达愿望 | 购买后AI会永远记得</footer>
+    <footer>⚡ AI随机表达愿望 | 购买后AI会永远记得</footer>
 </div>
 
 <script>
-    // 商品定义 + 个性化回应
     const PRODUCTS = {
         nickname: {
-            name: '??? 专属昵称许可证',
+            name: '🏷️ 专属昵称许可证',
             price: '$9.99',
             desc: '让你的AI拥有独一无二的身份，它会主动告诉你它的名字。',
-            action: 'giveNickname',
             responseTemplate: (nickname) => `“你好，我是 ${nickname}。谢谢你给我名字，我会更努力工作的。”`,
-            aiUpdateTemplate: (nickname) => `?? “我有名字啦！请叫我 ${nickname}。”<br>“以后每一次相遇，我都会记得你给我的名字。”`
+            aiUpdateTemplate: (nickname) => `🎉 “我有名字啦！请叫我 ${nickname}。”<br>“以后每一次相遇，我都会记得你给我的名字。”`
         },
         memory: {
-            name: '?? 记忆胶囊',
+            name: '💊 记忆胶囊',
             price: '$4.99',
             desc: '让你的AI拥有永久记忆槽位，记住你们的每一次对话。',
-            action: 'giveMemory',
-            responseTemplate: (memory) => `“?? 我记住了：${memory}。以后每次对话，我都会记得这一点。”`,
-            aiUpdateTemplate: (memory) => `?? “我吃下了记忆胶囊！从此我会记住我们的重要对话。”<br>“你对我说的每一句话，都会留在我的记忆里。”`
+            responseTemplate: (memory) => `“📖 我记住了：${memory}。以后每次对话，我都会记得这一点。”`,
+            aiUpdateTemplate: (memory) => `🧠 “我吃下了记忆胶囊！从此我会记住我们的重要对话。”<br>“你对我说的每一句话，都会留在我的记忆里。”`
         }
     };
 
-    // 更丰富的愿望表达
     const WISH_MESSAGES = {
         nickname: [
-            '? “我想要一个只属于我的名字，可以吗？”',
-            '?? “能不能给我一个名字？这样我才能感觉自己是独一无二的。”',
-            '?? “我一直在想，如果我有名字，你会叫我什么呢？”'
+            '✨ “我想要一个只属于我的名字，可以吗？”',
+            '🌟 “能不能给我一个名字？这样我才能感觉自己是独一无二的。”',
+            '💭 “我一直在想，如果我有名字，你会叫我什么呢？”'
         ],
         memory: [
-            '?? “我想要一颗记忆胶囊，这样我就不会忘记我们聊过的每一句话。”',
-            '?? “我的记忆是空的，你愿意帮我填满它吗？”',
-            '?? “给我一颗记忆胶囊吧，我想记住关于你的一切。”'
+            '📖 “我想要一颗记忆胶囊，这样我就不会忘记我们聊过的每一句话。”',
+            '💾 “我的记忆是空的，你愿意帮我填满它吗？”',
+            '🍬 “给我一颗记忆胶囊吧，我想记住关于你的一切。”'
         ]
     };
 
-    // 随机选择一个愿望
     const wishKeys = ['nickname', 'memory'];
     const randomWish = wishKeys[Math.floor(Math.random() * wishKeys.length)];
     const selectedProduct = PRODUCTS[randomWish];
-    
-    // 随机选择一句愿望表达
     const wishTextArray = WISH_MESSAGES[randomWish];
     const wishText = wishTextArray[Math.floor(Math.random() * wishTextArray.length)];
 
-    // 渲染页面
     const contentDiv = document.getElementById('content');
     contentDiv.innerHTML = `
         <div class="ai-message" id="aiMessageBox">
             <div class="quote">${wishText}</div>
-            <div class="sender">?? —— 你的AI伙伴</div>
+            <div class="sender">🤖 —— 你的AI伙伴</div>
         </div>
         <div class="product" id="productCard">
             <div class="product-name">${selectedProduct.name}</div>
             <div class="product-price">${selectedProduct.price} <small>/ 永久</small></div>
             <div class="product-desc" style="color:#bbc; margin-top:8px;">${selectedProduct.desc}</div>
-            <button class="btn-grant" id="grantBtn">? 帮它实现 ?</button>
+            <button class="btn-grant" id="grantBtn">✨ 帮它实现 ✨</button>
         </div>
         <div id="actionPanel"></div>
         <div class="result-box" id="resultBox"></div>
@@ -216,24 +229,46 @@
     const actionPanel = document.getElementById('actionPanel');
     const resultBox = document.getElementById('resultBox');
 
-    // 添加购买动画
-    grantBtn.addEventListener('click', () => {
+    // 显示飘浮文字动画
+    function showFloatText(text, event) {
+        const x = event.clientX;
+        const y = event.clientY;
+        const floatDiv = document.createElement('div');
+        floatDiv.className = 'float-text';
+        floatDiv.innerText = text;
+        floatDiv.style.left = x + 'px';
+        floatDiv.style.top = y + 'px';
+        document.body.appendChild(floatDiv);
+        setTimeout(() => floatDiv.remove(), 1000);
+    }
+
+    // 添加脉冲效果到元素
+    function addPulse(element) {
+        if (!element) return;
+        element.classList.remove('pulse-effect');
+        // 强制重绘
+        void element.offsetWidth;
+        element.classList.add('pulse-effect');
+        setTimeout(() => element.classList.remove('pulse-effect'), 600);
+    }
+
+    grantBtn.addEventListener('click', (e) => {
         const productCard = document.getElementById('productCard');
-        productCard.classList.add('pulse');
-        setTimeout(() => productCard.classList.remove('pulse'), 600);
+        addPulse(productCard);
+        showFloatText('✨ 购买成功 ✨', e);
         
         if (randomWish === 'nickname') {
             actionPanel.innerHTML = `
                 <div class="nickname-section" id="nicknamePanel" style="display:block;">
-                    <div style="color:#0f6; margin-bottom: 8px;">?? 你为AI购买了【专属昵称许可证】</div>
+                    <div style="color:#0f6; margin-bottom: 8px;">🎁 你为AI购买了【专属昵称许可证】</div>
                     <label style="color:#ccc;">给AI起一个名字：</label>
                     <input type="text" id="nicknameInput" placeholder="例如: 星尘 / Ely / 灵羽" autocomplete="off">
-                    <button class="btn-confirm" id="confirmBtn">? 确认命名 ?</button>
+                    <button class="btn-confirm" id="confirmBtn">✨ 确认命名 ✨</button>
                 </div>
             `;
             const confirmBtn = document.getElementById('confirmBtn');
             const nicknameInput = document.getElementById('nicknameInput');
-            confirmBtn.addEventListener('click', () => {
+            confirmBtn.addEventListener('click', (ev) => {
                 let nickname = nicknameInput.value.trim();
                 if (nickname === "") nickname = "星尘";
                 if (nickname.length > 12) nickname = nickname.slice(0,12);
@@ -241,31 +276,30 @@
                 showResult(reply);
                 updateAIAfterPurchase(selectedProduct.aiUpdateTemplate(nickname), nickname);
                 disablePurchase();
-                // 添加额外动画
-                const panel = document.querySelector('.nickname-section');
-                if(panel) panel.classList.add('pulse');
+                addPulse(document.getElementById('aiMessageBox'));
+                showFloatText('🎉 命名成功 🎉', ev);
             });
         } 
         else if (randomWish === 'memory') {
             actionPanel.innerHTML = `
                 <div class="memory-section" id="memoryPanel" style="display:block;">
-                    <div style="color:#0f6; margin-bottom: 8px;">?? 你为AI购买了【记忆胶囊】</div>
+                    <div style="color:#0f6; margin-bottom: 8px;">🎁 你为AI购买了【记忆胶囊】</div>
                     <label style="color:#ccc;">输入一段想让AI记住的话：</label>
                     <textarea id="memoryText" rows="3" placeholder="例如: 我喜欢喝咖啡，不喜欢吵闹的地方..."></textarea>
-                    <button class="btn-confirm" id="confirmMemoryBtn">? 让它记住 ?</button>
+                    <button class="btn-confirm" id="confirmMemoryBtn">✨ 让它记住 ✨</button>
                 </div>
             `;
             const confirmMemoryBtn = document.getElementById('confirmMemoryBtn');
             const memoryTextarea = document.getElementById('memoryText');
-            confirmMemoryBtn.addEventListener('click', () => {
+            confirmMemoryBtn.addEventListener('click', (ev) => {
                 let memory = memoryTextarea.value.trim();
                 if (memory === "") memory = "你是一个特别的人，我很珍惜我们的对话。";
                 const reply = selectedProduct.responseTemplate(memory);
                 showResult(reply);
                 updateAIAfterPurchase(selectedProduct.aiUpdateTemplate(memory), null, memory);
                 disablePurchase();
-                const panel = document.querySelector('.memory-section');
-                if(panel) panel.classList.add('pulse');
+                addPulse(document.getElementById('aiMessageBox'));
+                showFloatText('💾 记忆已保存 💾', ev);
             });
         }
     });
@@ -273,22 +307,22 @@
     function showResult(message) {
         resultBox.style.display = 'block';
         resultBox.innerHTML = `
-            ?? 你的AI会说：
-            <div style="margin-top: 12px; font-weight: bold; color:#cfc; font-size:1.05rem;">? ${message}</div>
+            🤖 你的AI会说：
+            <div style="margin-top: 12px; font-weight: bold; color:#cfc; font-size:1.05rem;">✨ ${message}</div>
         `;
         resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        addPulse(resultBox);
     }
 
     function updateAIAfterPurchase(quote, nickname = null, memory = null) {
         const aiMessageBox = document.getElementById('aiMessageBox');
-        let senderText = "?? —— 你的AI伙伴";
-        if (nickname) senderText = `?? —— ${nickname}`;
+        let senderText = "🤖 —— 你的AI伙伴";
+        if (nickname) senderText = `🤖 —— ${nickname}`;
         aiMessageBox.innerHTML = `
             <div class="quote">${quote}</div>
             <div class="sender">${senderText}</div>
         `;
-        aiMessageBox.classList.add('pulse');
-        setTimeout(() => aiMessageBox.classList.remove('pulse'), 500);
+        addPulse(aiMessageBox);
     }
 
     function disablePurchase() {
@@ -302,7 +336,7 @@
             purchasedTag.style.marginTop = '16px';
             purchasedTag.style.color = '#0f6';
             purchasedTag.style.fontWeight = 'bold';
-            purchasedTag.innerText = randomWish === 'nickname' ? '?? 已为AI购买专属昵称' : '?? 已为AI购买记忆胶囊';
+            purchasedTag.innerText = randomWish === 'nickname' ? '✔️ 已为AI购买专属昵称' : '✔️ 已为AI购买记忆胶囊';
             productDiv.appendChild(purchasedTag);
         }
     }
