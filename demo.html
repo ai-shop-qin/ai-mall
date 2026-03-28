@@ -142,14 +142,33 @@
         purchased: []
     };
 
+    // 保存数据（同步到本地存储 + 插件存储）
     function saveData() {
+        // 本地存储
         localStorage.setItem('my_ai_data', JSON.stringify(userData));
-        // 同时存一份到 sessionStorage，供插件读取（模拟）
         sessionStorage.setItem('ai_memory', JSON.stringify({
             nickname: userData.nickname,
             memory: userData.memory,
             favor: userData.favor
         }));
+
+        // ===== 新增：同步到插件 chrome.storage =====
+        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+            chrome.storage.local.set({
+                ai_nickname: userData.nickname,
+                ai_memory: userData.memory,
+                ai_favor: userData.favor
+            }, function() {
+                console.log('✅ 已同步到插件存储', {
+                    nickname: userData.nickname,
+                    memory: userData.memory,
+                    favor: userData.favor
+                });
+            });
+        } else {
+            console.log('⚠️ 插件未安装，仅保存到本地');
+        }
+        // ===== 新增结束 =====
     }
 
     function updateUI() {
@@ -208,7 +227,7 @@
             userData.purchased.push({ type: wishType, value, date: new Date().toLocaleString() });
             userData.favor += 3;
             userData.wishesGranted += 1;
-            saveData();
+            saveData();          // 这里调用 saveData，会同步到插件存储
             updateUI();
             
             const reply = wishType === 'nickname' 
@@ -233,15 +252,15 @@
         pluginCard.style.display = 'block';
         
         if (type === 'nickname') {
-            pluginMessage.innerHTML = `你的AI现在有了名字：<strong style="color:#0f6">${value}</strong><br><br>安装插件后，它在ChatGPT里会主动说：“我是${value}，很高兴认识你！”`;
+            pluginMessage.innerHTML = `你的AI现在有了名字：<strong style="color:#0f6">${value}</strong><br><br>安装插件后，它在ChatGPT/DeepSeek里会主动说：“我是${value}，很高兴认识你！”`;
         } else {
-            pluginMessage.innerHTML = `你的AI记住了：<strong style="color:#0f6">${value}</strong><br><br>安装插件后，它在ChatGPT里会主动提起这件事。`;
+            pluginMessage.innerHTML = `你的AI记住了：<strong style="color:#0f6">${value}</strong><br><br>安装插件后，它在ChatGPT/DeepSeek里会主动提起这件事。`;
         }
         
         document.getElementById('copyBtn').onclick = () => {
-            const link = 'https://chrome.google.com/webstore/detail/ai-memory-demo（插件链接待上线）';
+            const link = '插件安装教程：请按照之前的步骤在Edge中加载扩展。';
             navigator.clipboard.writeText(link);
-            alert('安装链接已复制！插件即将上线，敬请期待。');
+            alert('安装指引已复制！插件需手动加载，详见之前教程。');
         };
     }
 
