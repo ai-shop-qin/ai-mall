@@ -74,7 +74,6 @@
             border-radius: 24px;
             padding: 20px;
             margin-top: 20px;
-            display: none;
             border: 1px solid #ffaa66;
         }
         .code-block {
@@ -254,7 +253,17 @@
             
             document.getElementById('aiMsg').innerHTML = `<div class="quote">${reply}</div><div class="sender">🤖 —— ${userData.nickname || 'AI伙伴'}</div>`;
             
+            // 调用显示引导面板
             showPluginGuide(wishType, value);
+            
+            // 强制确保面板出现（0.5秒后备方案）
+            setTimeout(() => {
+                const pluginCard = document.getElementById('pluginCard');
+                if (pluginCard && pluginCard.style.display === 'none') {
+                    pluginCard.style.display = 'block';
+                    pluginCard.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 500);
             
             const wishCard = document.getElementById('wishCard');
             wishCard.style.display = 'none';
@@ -275,7 +284,6 @@
     function showPluginGuide(type, value) {
         const pluginCard = document.getElementById('pluginCard');
         const pluginMessage = document.getElementById('pluginMessage');
-        pluginCard.style.display = 'block';
         
         const nickname = userData.nickname || '未命名';
         const memory = userData.memory || '';
@@ -317,10 +325,17 @@ console.log('✅ AI 记忆已注入');`;
             </div>
         `;
         
-        document.getElementById('copyCodeBtn').onclick = () => {
-            navigator.clipboard.writeText(consoleCode);
-            alert('✅ 代码已复制！现在去 DeepSeek 页面按 F12，粘贴到 Console 并回车。');
-        };
+        // 确保面板可见
+        pluginCard.style.display = 'block';
+        
+        // 绑定复制按钮事件
+        const copyBtn = document.getElementById('copyCodeBtn');
+        if (copyBtn) {
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(consoleCode);
+                alert('✅ 代码已复制！现在去 DeepSeek 页面按 F12，粘贴到 Console 并回车。');
+            };
+        }
     }
 
     // 初始化
