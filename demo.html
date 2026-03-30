@@ -256,8 +256,8 @@
         const nick = userData.nickname || '未命名';
         const mem = userData.memory || '';
         
-        // 生成书签代码
-        const bookmarkCode = `javascript:(function(){var n="${nick.replace(/"/g, '\\"')}";var m="${mem.replace(/"/g, '\\"')}";var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#000;border-bottom:4px solid #0f6;padding:16px;z-index:9999999;text-align:center;font-family:monospace;color:#0f6;font-size:16px;font-weight:bold;box-shadow:0 2px 10px rgba(0,0,0,0.5);';b.innerHTML='[AI] 我的名字是 <span style=\"color:#ffaa66\">'+n+'</span>'+(m?' [记忆] 我记得：'+m:'');document.body.appendChild(b);document.body.style.paddingTop='70px';console.log('AI记忆已注入');})();`;
+        // 支持多平台的书签代码
+        const bookmarkCode = `javascript:(function(){var hosts=['chat.deepseek.com','chat.openai.com','yiyan.baidu.com','tongyi.aliyun.com','kimi.moonshot.cn','doubao.com'];var isSupported=hosts.some(function(h){return window.location.hostname===h;});if(isSupported){var n="${nick.replace(/"/g, '\\"')}";var m="${mem.replace(/"/g, '\\"')}";var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#000;border-bottom:4px solid #0f6;padding:16px;z-index:9999999;text-align:center;font-family:monospace;color:#0f6;font-size:16px;font-weight:bold;box-shadow:0 2px 10px rgba(0,0,0,0.5);';b.innerHTML='[AI] 我的名字是 <span style=\"color:#ffaa66\">'+n+'</span>'+(m?' [记忆] 我记得：'+m:'');document.body.appendChild(b);document.body.style.paddingTop='70px';console.log('AI记忆已注入');}else{alert('请在支持的AI平台使用此书签：DeepSeek、ChatGPT、文心一言、通义千问、Kimi、豆包');}})();`;
         
         // 生成控制台代码
         const consoleCode = `// 为你的 AI 注入记忆
@@ -280,20 +280,19 @@ console.log('AI 记忆已注入');`;
                 <a href="${bookmarkCode}" class="bookmark-btn" draggable="true" id="bookmarkDrag">✨ 注入 AI 记忆 ✨</a>
                 <div class="step-guide" style="margin-top:8px;">
                     💡 按住鼠标左键，把上面的绿色按钮拖到浏览器书签栏（地址栏下面）<br>
-                    之后在 DeepSeek 页面点击书签，AI 就会记住你
+                    之后在支持的AI平台（DeepSeek、ChatGPT、文心一言、通义千问、Kimi、豆包）点击书签，AI就会记住你
                 </div>
             </div>
             <div style="background:#0a2a2a; padding:16px; border-radius:16px;">
                 <div style="margin-bottom:8px; color:#0f6;">⌨️ 方式二：控制台代码（备用）</div>
                 <div class="code-block"><code id="injectCode">${escapeHtml(consoleCode)}</code></div>
                 <button class="copy-btn" id="copyCodeBtn">📋 复制代码</button>
-                <div class="step-guide">在 DeepSeek 页面按 F12 → Console → 粘贴代码 → 回车</div>
+                <div class="step-guide">在任何AI平台按 F12 → Console → 粘贴代码 → 回车</div>
             </div>
         `;
         
         resultCard.style.display = 'block';
         
-        // 绑定复制按钮
         document.getElementById('copyCodeBtn').onclick = () => {
             const codeText = document.getElementById('injectCode').innerText;
             navigator.clipboard.writeText(codeText);
