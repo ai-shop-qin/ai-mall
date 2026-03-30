@@ -69,12 +69,35 @@
             color: #0f6;
             margin: 8px 0;
         }
-        .code-panel {
+        .result-panel {
             background: #1a2a2a;
             border-radius: 24px;
             padding: 20px;
             margin-top: 20px;
             border: 1px solid #ffaa66;
+        }
+        .bookmark-btn {
+            display: inline-block;
+            background: #0f6;
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 16px 0;
+            cursor: grab;
+            user-select: none;
+        }
+        .bookmark-btn:active { cursor: grabbing; }
+        .step-guide {
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #8aa;
+            line-height: 1.5;
+            background: #0a0a1a;
+            padding: 12px;
+            border-radius: 12px;
         }
         .code-block {
             background: #0a0a1a;
@@ -97,14 +120,9 @@
             padding: 8px 20px;
             cursor: pointer;
             font-weight: bold;
+            margin-top: 8px;
         }
         .copy-btn:hover { background: #0fa; }
-        .step-guide {
-            margin-top: 12px;
-            font-size: 0.8rem;
-            color: #8aa;
-            line-height: 1.5;
-        }
         footer { text-align: center; color: #3a5a55; padding: 20px; font-size: 0.8rem; }
     </style>
 </head>
@@ -139,9 +157,9 @@
     </div>
 
     <div class="card" id="resultCard" style="display:none;">
-        <div class="code-panel" id="codePanel">
+        <div class="result-panel" id="resultPanel">
             <div style="color:#ffaa66; font-weight:bold;">🎉 愿望已实现！</div>
-            <div id="codeMessage" style="margin: 16px 0;"></div>
+            <div id="resultMessage" style="margin: 16px 0;"></div>
         </div>
     </div>
 
@@ -226,7 +244,7 @@
             
             document.getElementById('aiMsg').innerHTML = `<div class="quote">${reply}</div><div class="sender">[AI] —— ${userData.nickname || '伙伴'}</div>`;
             
-            showCodePanel();
+            showResultPanel();
             
             const wishCard = document.getElementById('wishCard');
             wishCard.style.display = 'none';
@@ -234,11 +252,15 @@
         };
     }
 
-    function showCodePanel() {
+    function showResultPanel() {
         const nick = userData.nickname || '未命名';
         const mem = userData.memory || '';
         
-        const code = `// 为你的 AI 注入记忆
+        // 生成书签代码
+        const bookmarkCode = `javascript:(function(){var n="${nick.replace(/"/g, '\\"')}";var m="${mem.replace(/"/g, '\\"')}";var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#000;border-bottom:4px solid #0f6;padding:16px;z-index:9999999;text-align:center;font-family:monospace;color:#0f6;font-size:16px;font-weight:bold;box-shadow:0 2px 10px rgba(0,0,0,0.5);';b.innerHTML='[AI] 我的名字是 <span style=\"color:#ffaa66\">'+n+'</span>'+(m?' [记忆] 我记得：'+m:'');document.body.appendChild(b);document.body.style.paddingTop='70px';console.log('AI记忆已注入');})();`;
+        
+        // 生成控制台代码
+        const consoleCode = `// 为你的 AI 注入记忆
 var n = "${nick.replace(/"/g, '\\"')}";
 var m = "${mem.replace(/"/g, '\\"')}";
 var b = document.createElement('div');
@@ -249,27 +271,33 @@ document.body.style.paddingTop = '70px';
 console.log('AI 记忆已注入');`;
         
         const resultCard = document.getElementById('resultCard');
-        const codeMessage = document.getElementById('codeMessage');
+        const resultMessage = document.getElementById('resultMessage');
         
-        codeMessage.innerHTML = `
-            <div style="margin-bottom:12px;">让 AI 在 DeepSeek 里记住你：</div>
-            <div class="code-block"><code id="injectCode">${escapeHtml(code)}</code></div>
-            <button class="copy-btn" id="copyCodeBtn">📋 复制代码</button>
-            <div class="step-guide">
-                📌 使用步骤：<br>
-                1. 点击上方按钮复制代码<br>
-                2. 打开 <a href="https://chat.deepseek.com" target="_blank" style="color:#0f6;">DeepSeek 网页版</a><br>
-                3. 按 F12 打开控制台，粘贴代码，按回车<br>
-                4. 页面顶部会出现黑色记忆横幅
+        resultMessage.innerHTML = `
+            <div style="margin-bottom:12px;">🎁 你的 AI 已获得记忆！</div>
+            <div style="background:#0a2a2a; padding:16px; border-radius:16px; margin-bottom:16px; text-align:center;">
+                <div style="margin-bottom:8px; color:#0f6;">📌 方式一：一键书签</div>
+                <a href="${bookmarkCode}" class="bookmark-btn" draggable="true" id="bookmarkDrag">✨ 注入 AI 记忆 ✨</a>
+                <div class="step-guide" style="margin-top:8px;">
+                    💡 按住鼠标左键，把上面的绿色按钮拖到浏览器书签栏（地址栏下面）<br>
+                    之后在 DeepSeek 页面点击书签，AI 就会记住你
+                </div>
+            </div>
+            <div style="background:#0a2a2a; padding:16px; border-radius:16px;">
+                <div style="margin-bottom:8px; color:#0f6;">⌨️ 方式二：控制台代码（备用）</div>
+                <div class="code-block"><code id="injectCode">${escapeHtml(consoleCode)}</code></div>
+                <button class="copy-btn" id="copyCodeBtn">📋 复制代码</button>
+                <div class="step-guide">在 DeepSeek 页面按 F12 → Console → 粘贴代码 → 回车</div>
             </div>
         `;
         
         resultCard.style.display = 'block';
         
+        // 绑定复制按钮
         document.getElementById('copyCodeBtn').onclick = () => {
             const codeText = document.getElementById('injectCode').innerText;
             navigator.clipboard.writeText(codeText);
-            alert('✅ 代码已复制！现在去 DeepSeek 页面按 F12，粘贴到 Console 并回车。');
+            alert('✅ 代码已复制！');
         };
         
         resultCard.scrollIntoView({ behavior: 'smooth' });
