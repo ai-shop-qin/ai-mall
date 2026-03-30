@@ -77,7 +77,7 @@
             display: none;
             border: 1px solid #ffaa66;
         }
-        .copy-btn {
+        .copy-btn, .sync-btn {
             background: #ffaa33;
             color: #000;
             border: none;
@@ -85,9 +85,12 @@
             padding: 8px 16px;
             cursor: pointer;
             margin-top: 12px;
+            margin-right: 10px;
+        }
+        .sync-btn {
+            background: #0f6;
         }
         footer { text-align: center; color: #3a5a55; padding: 20px; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(10px);} to { opacity:1; transform:translateY(0);} }
     </style>
 </head>
 <body>
@@ -124,8 +127,11 @@
         <div class="plugin-guide" id="pluginGuide">
             <div style="color:#ffaa66; font-weight:bold;">🎉 愿望已实现！</div>
             <div id="pluginMessage" style="margin: 16px 0;"></div>
-            <button class="copy-btn" id="copyBtn">📋 复制安装链接</button>
-            <div style="margin-top: 12px; font-size:0.8rem; color:#8aa;">安装后，你的AI会在对话中主动使用这些信息。</div>
+            <div>
+                <button class="sync-btn" id="syncToPluginBtn">📡 同步到插件</button>
+                <button class="copy-btn" id="copyBtn">📋 复制安装链接</button>
+            </div>
+            <div style="margin-top: 12px; font-size:0.8rem; color:#8aa;">同步后，打开DeepSeek即可看到AI记住你。</div>
         </div>
     </div>
 
@@ -142,33 +148,15 @@
         purchased: []
     };
 
-    // 保存数据（同步到本地存储 + 插件存储）
+    // 保存数据（本地）
     function saveData() {
-        // 本地存储
         localStorage.setItem('my_ai_data', JSON.stringify(userData));
         sessionStorage.setItem('ai_memory', JSON.stringify({
             nickname: userData.nickname,
             memory: userData.memory,
             favor: userData.favor
         }));
-
-        // ===== 新增：同步到插件 chrome.storage =====
-        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-            chrome.storage.local.set({
-                ai_nickname: userData.nickname,
-                ai_memory: userData.memory,
-                ai_favor: userData.favor
-            }, function() {
-                console.log('✅ 已同步到插件存储', {
-                    nickname: userData.nickname,
-                    memory: userData.memory,
-                    favor: userData.favor
-                });
-            });
-        } else {
-            console.log('⚠️ 插件未安装，仅保存到本地');
-        }
-        // ===== 新增结束 =====
+        console.log('💾 数据已保存到本地');
     }
 
     function updateUI() {
@@ -227,7 +215,7 @@
             userData.purchased.push({ type: wishType, value, date: new Date().toLocaleString() });
             userData.favor += 3;
             userData.wishesGranted += 1;
-            saveData();          // 这里调用 saveData，会同步到插件存储
+            saveData();
             updateUI();
             
             const reply = wishType === 'nickname' 
@@ -252,15 +240,39 @@
         pluginCard.style.display = 'block';
         
         if (type === 'nickname') {
-            pluginMessage.innerHTML = `你的AI现在有了名字：<strong style="color:#0f6">${value}</strong><br><br>安装插件后，它在ChatGPT/DeepSeek里会主动说：“我是${value}，很高兴认识你！”`;
+            pluginMessage.innerHTML = `
+                <div>你的AI现在有了名字：<strong style="color:#0f6">${value}</strong></div>
+                <div style="margin-top:12px;">要让AI在其他地方也记住这个名字吗？点击“同步到插件”。</div>
+            `;
         } else {
-            pluginMessage.innerHTML = `你的AI记住了：<strong style="color:#0f6">${value}</strong><br><br>安装插件后，它在ChatGPT/DeepSeek里会主动提起这件事。`;
+            pluginMessage.innerHTML = `
+                <div>你的AI记住了：<strong style="color:#0f6">${value}</strong></div>
+                <div style="margin-top:12px;">要让AI在其他地方也记住这件事吗？点击“同步到插件”。</div>
+            `;
         }
         
+        // 同步按钮
+        const syncBtn = document.getElementById('syncToPluginBtn');
+        syncBtn.onclick = () => {
+            const syncData = {
+                ai_nickname: userData.nickname,
+                ai_memory: userData.memory,
+                ai_favor: userData.favor
+            };
+            
+            if (typeof chrome !== 'undefined' && chrome.storage) {
+                chrome.storage.local.set(syncData, () => {
+                    alert('✅ 数据已同步到插件！现在打开 DeepSeek 就能看到效果。');
+                });
+            } else {
+                alert('⚠️ 未检测到插件，请先安装 AI Memory Companion 插件。\n\n安装方法：\n1. 在 Edge 地址栏输入 edge://extensions/\n2. 打开“开发人员模式”\n3. 加载 ai-memory-plugin 文件夹');
+            }
+        };
+        
+        // 复制按钮
         document.getElementById('copyBtn').onclick = () => {
-            const link = '插件安装教程：请按照之前的步骤在Edge中加载扩展。';
-            navigator.clipboard.writeText(link);
-            alert('安装指引已复制！插件需手动加载，详见之前教程。');
+            navigator.clipboard.writeText('插件安装教程：在 Edge 扩展页面加载 ai-memory-plugin 文件夹');
+            alert('安装指引已复制！');
         };
     }
 
