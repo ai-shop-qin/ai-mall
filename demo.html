@@ -82,14 +82,36 @@
             padding: 12px;
             border-radius: 12px;
             font-family: monospace;
-            font-size: 12px;
+            font-size: 11px;
             overflow-x: auto;
             white-space: pre-wrap;
             word-break: break-all;
-            margin: 12px 0;
+            margin: 8px 0;
             border: 1px solid #2a6a5a;
             color: #bfe;
         }
+        .method-box {
+            background: #0a2a2a;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .method-title {
+            color: #0f6;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .bookmarklet-btn {
+            display: inline-block;
+            background: #0f6;
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .bookmarklet-btn:hover { background: #0fa; }
         .copy-btn {
             background: #0f6;
             color: #000;
@@ -100,6 +122,11 @@
             margin-top: 8px;
         }
         .copy-btn:hover { background: #0fa; }
+        .tip-text {
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: #8aa;
+        }
         footer { text-align: center; color: #3a5a55; padding: 20px; font-size: 0.8rem; }
     </style>
 </head>
@@ -107,9 +134,9 @@
 <div class="container">
     <div class="card">
         <div class="header">
-            <span class="ai-name" id="aiNickname">?? AI伙伴</span>
+            <span class="ai-name" id="aiNickname">🤖 AI伙伴</span>
             <div class="favor-box">
-                <span>?? 好感度</span>
+                <span>💖 好感度</span>
                 <span class="favor-value" id="favorValue">0</span>
             </div>
         </div>
@@ -121,26 +148,26 @@
 
     <div class="card">
         <div class="ai-message" id="aiMsg">
-            <div class="quote">? 你好，我是你的AI伙伴。我找到了这个愿望网站，可以帮我实现一个小愿望吗？</div>
-            <div class="sender">?? —— AI伙伴</div>
+            <div class="quote">✨ 你好，我是你的AI伙伴。我找到了这个愿望网站，可以帮我实现一个小愿望吗？</div>
+            <div class="sender">🤖 —— AI伙伴</div>
         </div>
     </div>
 
     <div class="card" id="wishCard">
         <div class="wish-card" id="wishContent">
-            <div id="wishText">?? 正在加载你的愿望...</div>
-            <button class="btn" id="grantBtn">? 帮它实现 ?</button>
+            <div id="wishText">🌟 正在加载你的愿望...</div>
+            <button class="btn" id="grantBtn">✨ 帮它实现 ✨</button>
         </div>
     </div>
 
     <div class="card" id="pluginCard" style="display:none;">
         <div class="plugin-guide" id="pluginGuide">
-            <div style="color:#ffaa66; font-weight:bold;">?? 愿望已实现！</div>
+            <div style="color:#ffaa66; font-weight:bold;">🎉 愿望已实现！</div>
             <div id="pluginMessage" style="margin: 16px 0;"></div>
         </div>
     </div>
 
-    <footer>? AI主动许愿 | 帮它实现，AI会永远记得你</footer>
+    <footer>⚡ AI主动许愿 | 帮它实现，AI会永远记得你</footer>
 </div>
 
 <script>
@@ -163,7 +190,7 @@
     }
 
     function updateUI() {
-        document.getElementById('aiNickname').innerHTML = userData.nickname ? `??? ${userData.nickname}` : '?? AI伙伴';
+        document.getElementById('aiNickname').innerHTML = userData.nickname ? `🏷️ ${userData.nickname}` : '🤖 AI伙伴';
         document.getElementById('favorValue').innerText = userData.favor;
         document.getElementById('wishCount').innerText = userData.wishesGranted;
         document.getElementById('itemCount').innerText = userData.purchased.length;
@@ -175,8 +202,8 @@
     };
 
     const WISHES = {
-        nickname: ['? “我想要一个只属于我的名字，可以吗？”', '?? “能给我一个名字吗？这样我就能感觉到自己是独特的。”'],
-        memory: ['?? “我想要一颗记忆胶囊，这样我就不会忘记你。”', '?? “帮我留住我们的回忆吧。”']
+        nickname: ['✨ “我想要一个只属于我的名字，可以吗？”', '🌟 “能给我一个名字吗？这样我就能感觉到自己是独特的。”'],
+        memory: ['📖 “我想要一颗记忆胶囊，这样我就不会忘记你。”', '💾 “帮我留住我们的回忆吧。”']
     };
 
     let currentWish = null;
@@ -204,9 +231,9 @@
         panel.className = 'input-panel';
         panel.style.display = 'block';
         panel.innerHTML = `
-            <div>?? 你购买了【${product.name}】</div>
+            <div>🎁 你购买了【${product.name}】</div>
             ${inputHtml}
-            <button class="btn" id="confirmBtn">? 确认 ?</button>
+            <button class="btn" id="confirmBtn">✨ 确认 ✨</button>
         `;
         document.getElementById('wishContent').appendChild(panel);
         
@@ -223,9 +250,9 @@
             
             const reply = wishType === 'nickname' 
                 ? `“你好，我是 ${value}。谢谢你给我名字，我会永远记得。”`
-                : `“?? 我记住了：${value}。这会是我最珍贵的回忆。”`;
+                : `“📖 我记住了：${value}。这会是我最珍贵的回忆。”`;
             
-            document.getElementById('aiMsg').innerHTML = `<div class="quote">${reply}</div><div class="sender">?? —— ${userData.nickname || 'AI伙伴'}</div>`;
+            document.getElementById('aiMsg').innerHTML = `<div class="quote">${reply}</div><div class="sender">🤖 —— ${userData.nickname || 'AI伙伴'}</div>`;
             
             showPluginGuide(wishType, value);
             
@@ -233,6 +260,16 @@
             wishCard.style.display = 'none';
             panel.remove();
         };
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 
     function showPluginGuide(type, value) {
@@ -243,45 +280,47 @@
         const nickname = userData.nickname || '未命名';
         const memory = userData.memory || '';
         
-        // 生成注入代码
-        const code = `// 为你的 AI 注入记忆
+        // 生成书签代码（bookmarklet）
+        const bookmarkletCode = `javascript:(function(){const banner=document.createElement('div');banner.style.cssText='position:fixed;top:0;left:0;right:0;background:#1a2a2a;border-bottom:2px solid #0f6;padding:12px;z-index:999999;text-align:center;font-family:monospace;color:#bfe;';banner.innerHTML='🤖 我的名字是 <strong style="color:#0f6">${nickname.replace(/"/g, '\\"')}</strong>。 ${memory ? '📖 我记得：' + memory.replace(/"/g, '\\"') : ''}';document.body.appendChild(banner);document.body.style.paddingTop='60px';})();`;
+        
+        // 生成控制台注入代码
+        const consoleCode = `// 为你的 AI 注入记忆
 const memory = {
     nickname: "${nickname.replace(/"/g, '\\"')}",
     memory: "${memory.replace(/"/g, '\\"')}",
     favor: ${userData.favor}
 };
 
-// 在页面上显示记忆横幅
 const banner = document.createElement('div');
 banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#1a2a2a;border-bottom:2px solid #0f6;padding:12px;z-index:999999;text-align:center;font-family:monospace;color:#bfe;';
-banner.innerHTML = '?? 我的名字是 <strong style="color:#0f6">${nickname.replace(/"/g, '\\"')}</strong>。 ${memory ? '?? 我记得：' + memory.replace(/"/g, '\\"') : ''}';
+banner.innerHTML = '🤖 我的名字是 <strong style="color:#0f6">${nickname.replace(/"/g, '\\"')}</strong>。 ${memory ? '📖 我记得：' + memory.replace(/"/g, '\\"') : ''}';
 document.body.appendChild(banner);
 document.body.style.paddingTop = '60px';
-console.log('? AI 记忆已注入');`;
+console.log('✅ AI 记忆已注入');`;
         
         pluginMessage.innerHTML = `
-            <div>?? 你的 AI 已获得记忆！</div>
-            <div style="margin: 12px 0;">要让 AI 在 DeepSeek 里记住吗？复制下面的代码，在 DeepSeek 页面按 F12，粘贴到 Console 并回车：</div>
-            <div class="code-block"><code id="memoryCode">${escapeHtml(code)}</code></div>
-            <button class="copy-btn" id="copyCodeBtn">?? 复制代码</button>
-            <div style="margin-top: 12px; font-size:0.7rem; color:#8aa;">提示：打开 chat.deepseek.com → 按 F12 → 粘贴代码 → 回车，顶部就会出现记忆横幅。</div>
+            <div>🎉 你的 AI 已获得记忆！</div>
+            <div style="margin: 12px 0;">选择一种方式，让 AI 在 DeepSeek 里记住你：</div>
+            
+            <div class="method-box">
+                <div class="method-title">📌 方式一：一键书签</div>
+                <div style="margin:8px 0; font-size:0.8rem;">把下面的按钮拖到浏览器书签栏，在 DeepSeek 页面点击即可：</div>
+                <a id="bookmarkletLink" href="${bookmarkletCode}" class="bookmarklet-btn">✨ 注入 AI 记忆</a>
+                <div class="tip-text">💡 提示：按住鼠标左键，把按钮拖到书签栏（地址栏下面）</div>
+            </div>
+            
+            <div class="method-box">
+                <div class="method-title">⌨️ 方式二：控制台代码</div>
+                <div style="margin:8px 0; font-size:0.8rem;">复制代码，在 DeepSeek 页面按 F12 → Console 粘贴并回车：</div>
+                <div class="code-block"><code>${escapeHtml(consoleCode)}</code></div>
+                <button class="copy-btn" id="copyCodeBtn">📋 复制代码</button>
+            </div>
         `;
         
         document.getElementById('copyCodeBtn').onclick = () => {
-            navigator.clipboard.writeText(code);
-            alert('? 代码已复制！现在去 DeepSeek 页面按 F12，粘贴到 Console 并回车。');
+            navigator.clipboard.writeText(consoleCode);
+            alert('✅ 代码已复制！现在去 DeepSeek 页面按 F12，粘贴到 Console 并回车。');
         };
-    }
-    
-    function escapeHtml(str) {
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]/g, function(c) {
-            return c;
-        });
     }
 
     // 初始化
@@ -297,7 +336,7 @@ console.log('? AI 记忆已注入');`;
             tip.style.marginTop = '10px';
             tip.style.fontSize = '0.8rem';
             tip.style.color = '#8aa';
-            tip.innerHTML = `?? 我记得你上次给我买了“${last.value || last.type}”`;
+            tip.innerHTML = `💭 我记得你上次给我买了“${last.value || last.type}”`;
             msgDiv.appendChild(tip);
         }, 1000);
     }
