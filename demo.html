@@ -244,6 +244,19 @@
             
             document.getElementById('aiMsg').innerHTML = `<div class="quote">${reply}</div><div class="sender">[AI] —— ${userData.nickname || '伙伴'}</div>`;
             
+            // ===== 向插件发送记忆数据 =====
+            if (window.postMessage) {
+                window.postMessage({
+                    type: 'AI_MEMORY_UPDATE',
+                    data: {
+                        nickname: userData.nickname,
+                        memory: userData.memory || ''
+                    }
+                }, 'https://ai-shop-qin.github.io');
+                console.log('已向插件发送记忆:', userData.nickname);
+            }
+            // ============================
+            
             showResultPanel();
             
             const wishCard = document.getElementById('wishCard');
@@ -288,6 +301,10 @@ console.log('AI 记忆已注入');`;
                 <div class="code-block"><code id="injectCode">${escapeHtml(consoleCode)}</code></div>
                 <button class="copy-btn" id="copyCodeBtn">📋 复制代码</button>
                 <div class="step-guide">在任何AI平台按 F12 → Console → 粘贴代码 → 回车</div>
+            </div>
+            <div style="margin-top:16px; padding:12px; background:#0a2a2a; border-radius:16px;">
+                <div style="color:#0f6;">🤖 插件用户</div>
+                <div class="step-guide">如果你安装了 AI Memory Companion 插件，记忆会自动同步，打开AI平台即可看到横幅。</div>
             </div>
         `;
         
